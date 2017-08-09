@@ -2,9 +2,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.yanxit.reminders.RemindersActivity">
-    <item
-        android:id="@+id/action_settings"
+
+    <item android:id="@+id/action_new"
+        android:title="新建备忘"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        ></item>
+    <item android:id="@+id/action_exit"
+        android:title="退出"
+        android:orderInCategory="200"
+        app:showAsAction="never"
+        ></item>
 </menu>
