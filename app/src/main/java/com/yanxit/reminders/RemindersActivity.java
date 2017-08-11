@@ -1,15 +1,20 @@
 package com.yanxit.reminders;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -25,12 +30,13 @@ public class RemindersActivity extends AppCompatActivity {
     private DbAdapter dbAdapter;
 
     @Override
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminders);
         mListView = (ListView)findViewById(R.id.reminders_list_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        this.deleteDatabase("reminders");
+        //this.deleteDatabase("reminders");
         dbAdapter = new DbAdapter(this);
         dbAdapter.open();
         mListView.setAdapter(dbAdapter.getRemidersAsAdapter());
@@ -67,6 +73,49 @@ public class RemindersActivity extends AppCompatActivity {
             }
         });
         setSupportActionBar(toolbar);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+            mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+            mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+                @Override
+                public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
+                }
+
+                @Override
+                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                    MenuInflater inflater = mode.getMenuInflater();
+                    inflater.inflate(R.menu.cam_menu,menu);
+                    return true;
+                }
+
+                @Override
+                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                    switch (item.getItemId()){
+                        case R.id.menu_item_delete_reminder:
+                            for(long itemId: mListView.getCheckedItemIds()){
+                                View itemView = mListView.findViewById((int)itemId);
+                                Reminder reminder = (Reminder)itemView.getTag();
+                                dbAdapter.deleteReminder(reminder.getId());
+                            }
+                            mode.finish();
+                            ((RemindersCursorAdapter) mListView.getAdapter()).changeCursor(dbAdapter.findAllAsCursor());
+                            return true;
+                    }
+                    return false;
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode mode) {
+
+                }
+            });
+        }
     }
 
 
