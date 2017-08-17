@@ -29,24 +29,10 @@ public class RemindersCursorAdapter extends SimpleCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         super.bindView(view, context, cursor);
         View listTab = view.findViewById(R.id.row_tab);
-        if(view.getParent() instanceof ListView){
-            ListView listView = (ListView)view.getParent();
-            int pos = -1;
-            for(int i=0;i<listView.getChildCount();i++){
-                if(listView.getChildAt(i)==view){
-                    pos = i;
-                    break;
-                }
-            }
-            Log.i(this.getClass().getName(),String.format("cursor position is %d, the view position is %d, the tag before bind is %s",
-                    cursor.getPosition(),pos,view.getTag()==null?"<NULL>":view.getTag().toString()));
-        } else {
-            Log.e(this.getClass().getName(),"the view's parent is not the list view");
-        }
-
         Reminder reminder = (Reminder)view.getTag();
-        if(reminder==null){
-            reminder = new Reminder(cursor.getInt(DbAdapter.INDEX_ID),cursor.getString(DbAdapter.INDEX_CONTENT),cursor.getInt(DbAdapter.INDEX_IMPORTANT));
+        int id = cursor.getInt(DbAdapter.INDEX_ID);
+        if(reminder==null || id!=reminder.getId()){
+            reminder = new Reminder(id,cursor.getString(DbAdapter.INDEX_CONTENT),cursor.getInt(DbAdapter.INDEX_IMPORTANT));
             view.setTag(reminder);
             Log.i(this.getClass().getName(),String.format("the reminder %s is bind to the view %s ",
                     reminder.toString(),view.toString()));
