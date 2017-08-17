@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,6 +52,8 @@ public class RemindersActivity extends AppCompatActivity {
                 modelViews.setAdapter(modelAdapter);
                 builder.setView(modelViews);
                 final Reminder reminder = (Reminder)itemView.getTag();
+                Log.i(this.getClass().getName(),String.format("the reminder %s, the view %s ",
+                        reminder.toString(),itemView.toString()));
                 final Dialog dialog = builder.create();
                 dialog.show();
                 modelViews.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -98,8 +101,11 @@ public class RemindersActivity extends AppCompatActivity {
                 public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                     switch (item.getItemId()){
                         case R.id.menu_item_delete_reminder:
-                            for(long itemId: mListView.getCheckedItemIds()){
-                                View itemView = mListView.findViewById((int)itemId);
+                            SparseBooleanArray items = mListView.getCheckedItemPositions();
+                            for(int i=0;i<items.size();i++){
+                                int key = items.keyAt(i);
+                                if(!items.get(key))continue;
+                                View itemView = mListView.getChildAt(key);
                                 Reminder reminder = (Reminder)itemView.getTag();
                                 dbAdapter.deleteReminder(reminder.getId());
                             }

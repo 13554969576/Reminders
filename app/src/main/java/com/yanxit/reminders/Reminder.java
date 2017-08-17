@@ -41,4 +41,13 @@ public class Reminder {
 
     public Reminder() {
     }
+
+    @Override
+    public String toString() {
+        return "Reminder{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", important=" + important +
+                '}';
+    }
 }
